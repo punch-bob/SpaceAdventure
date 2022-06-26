@@ -1,6 +1,5 @@
 
 import { Ship } from './ship.js';
-import { SHIP_SIZE } from './constants.js'
 import { ENEMY_SHIP_SIZE } from './constants.js'
 import { HALF_GAME_SCENE_WIDTH } from './constants.js';
 import { GAME_SCENE_HEIGHT } from './constants.js';
@@ -10,6 +9,7 @@ const TICKS_IN_ROW = 300;
 const RELOAD_SPEED = 10;
 
 const SHIP_SPEED = 0.1;
+const SHIP_SHIFT_SPEED = SHIP_SPEED * 3;
 const BULLET_SPEED = SHIP_SPEED * 3;
 const LINES_IN_SQUAD = 4;
 
@@ -89,44 +89,52 @@ class World {
         return this.player;
     }
 
-    update_() {
-        this.ticks++;
-        if (this.last_bullet_t >= 1) this.last_bullet_t++;
-        if (this.last_bullet_t >= RELOAD_SPEED) this.last_bullet_t = 0;
-
-        // this.enemiesSquads.forEach((enemiesSquad) => {
-        //     enemiesSquad.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
-        // });
-
+    checkLeftAndRightBorder() {
         for (const enemiesSquad of this.enemiesSquads) {
-            enemiesSquad.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
-        }
-
-        for (const enemiesSquad of this.enemiesSquads) {
-            //console.log(enemy.touchLeftBorder());
             for (const enemy of enemiesSquad.enemies) {
-                if (enemy.touchLeftBorder()) {
-                    console.log('touch left boarder');
+                if (enemy.touchLeftBorder(SHIP_SHIFT_SPEED)) {
+                    console.log(enemy.getPosition());
                     enemiesSquad.squadGoLeft = false;
                     break;
                 }
-                if (enemy.touchRightBorder()) {
+                if (enemy.touchRightBorder(SHIP_SHIFT_SPEED)) {
+                    console.log(enemy.getPosition());
                     enemiesSquad.squadGoLeft = true;
                     break;
                 }
             }
         }
+    }
 
+    shiftEnemiesSquads() {
         if (this.ticks % 5 === 0) {
             for (const enemiesSquad of this.enemiesSquads) {
                 if (enemiesSquad.squadGoLeft) {
-                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveLeft(SHIP_SPEED * 2) });
+                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveLeft(SHIP_SHIFT_SPEED) });
                 }
                 else {
-                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveRight(SHIP_SPEED * 2) });                
+                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveRight(SHIP_SHIFT_SPEED) });                
                 }
             }
         }
+    }
+
+    moveEnemiesSquadsDown() {
+        for (const enemiesSquad of this.enemiesSquads) {
+            enemiesSquad.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
+        }
+    }
+
+    update_() {
+        this.ticks++;
+        if (this.last_bullet_t >= 1) this.last_bullet_t++;
+        if (this.last_bullet_t >= RELOAD_SPEED) this.last_bullet_t = 0;
+
+        this.checkLeftAndRightBorder();
+
+        this.moveEnemiesSquadsDown();
+
+        this.shiftEnemiesSquads();
 
         this.bullets.forEach((bullet) => {bullet.moveUp(BULLET_SPEED)});
 

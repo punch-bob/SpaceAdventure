@@ -31,14 +31,16 @@ class Ship {
         this.checkCoord();
     }
 
-    moveRight(value) {
-        this.UIobj.position.x += value;
-        this.checkCoord();
+    moveRight(value = 0) {
+        if (!this.touchRightBorder(value)) {
+            this.UIobj.position.x += value;
+        }
     }
 
-    moveLeft(value) {
-        this.UIobj.position.x -= value;
-        this.checkCoord();
+    moveLeft(value = 0) {
+        if (!this.touchLeftBorder(value)) {
+            this.UIobj.position.x -= value;
+        }
     }
 
     touchLeftBorder(value = 0) {
@@ -53,7 +55,7 @@ class Ship {
         return false;
     }
 
-    moveUp(value) {
+    moveUp(value = 0) {
         this.UIobj.position.y += value;
         if (!this.checkCoord()) {
             removeObject3D(this.UIobj);
@@ -61,7 +63,7 @@ class Ship {
         }
     }
 
-    moveDown(value) {
+    moveDown(value = 0) {
         this.UIobj.position.y -= value;
         if (!this.checkCoord()) {
             removeObject3D(this.UIobj);
