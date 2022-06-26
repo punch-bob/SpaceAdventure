@@ -62,6 +62,7 @@ class Game {
         let sprite = new THREE.TextureLoader().load('./models/star.png');
         let starMaterial = new THREE.PointsMaterial({
             color: 0x5555AA,
+            transparent: true,
             size: 0.7,
             map: sprite
         });
