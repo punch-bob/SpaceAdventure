@@ -107,7 +107,7 @@ class World {
     }
 
     shiftEnemiesSquads() {
-        if (this.ticks % 5 === 0) {
+        if (this.ticks % 4 === 0) {
             for (const enemiesSquad of this.enemiesSquads) {
                 if (enemiesSquad.squadGoLeft) {
                     enemiesSquad.enemies.forEach((enemy) => { enemy.moveLeft(SHIP_SHIFT_SPEED) });
