@@ -7,10 +7,11 @@ import { GAME_SCENE_HEIGHT } from './constants.js';
 
 const ENEMIES_IN_ROW = 10;
 const TICKS_IN_ROW = 300;
-const RELOAD_SPEED = 20;
+const RELOAD_SPEED = 10;
 
 const SHIP_SPEED = 0.1;
 const BULLET_SPEED = SHIP_SPEED * 3;
+const LINES_IN_SQUAD = 4;
 
 class World {
     constructor(scene, modelManager) {
@@ -24,7 +25,8 @@ class World {
     initialize() {
         this.player = new Ship(this.modelManager.getPlayerModel(), 0, 0, 0, this.scene_);
 
-        this.enemies = [];
+        
+        this.enemiesSquads = [];
 
         this.bullets = [];
         this.last_bullet_t = 0;
@@ -33,26 +35,35 @@ class World {
     }
 
     spawnMatrixOfEnemies() {
-        for (let i = 0; i < 4; ++i) {
-            this.spawnRowOfEnemies(i * ENEMY_SHIP_SIZE * 2);
+        const enemiesSquad = {
+            enemies: [],
+            squadGoLeft: true
         }
+
+        for (let i = 0; i < LINES_IN_SQUAD; ++i) {
+            enemiesSquad.enemies.push(...this.spawnRowOfEnemies(i * ENEMY_SHIP_SIZE * 2));
+        }
+
+        this.enemiesSquads.push(enemiesSquad);
     }
 
     spawnRowOfEnemies(shift) {
+        const enemiesLine = [];
         if (ENEMIES_IN_ROW % 2 == 1) {
             let enemy = new Ship(this.modelManager.getEnemyModel(), 0, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            this.enemies.push(enemy);
+            enemiesLine.push(enemy);
         }
 
         let half = (ENEMIES_IN_ROW - (ENEMIES_IN_ROW % 2)) / 2;
 
         for (let i = 0; i < half; ++i) {
             let enemyRight = new Ship(this.modelManager.getEnemyModel(), i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            this.enemies.push(enemyRight);
+            enemiesLine.push(enemyRight);
 
             let enemyLeft = new Ship(this.modelManager.getEnemyModel(), -i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            this.enemies.push(enemyLeft);
+            enemiesLine.push(enemyLeft);
         }
+        return enemiesLine;
     }
 
     movePlayerLeft(val) {
@@ -78,42 +89,50 @@ class World {
         return this.player;
     }
 
-    getEnemies() {
-        return this.enemies;
-    }
-
     update_() {
         this.ticks++;
         if (this.last_bullet_t >= 1) this.last_bullet_t++;
         if (this.last_bullet_t >= RELOAD_SPEED) this.last_bullet_t = 0;
 
-        this.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
+        // this.enemiesSquads.forEach((enemiesSquad) => {
+        //     enemiesSquad.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
+        // });
+
+        for (const enemiesSquad of this.enemiesSquads) {
+            enemiesSquad.enemies.forEach((enemy) => {enemy.moveDown(SHIP_SPEED)});
+        }
+
+        for (const enemiesSquad of this.enemiesSquads) {
+            //console.log(enemy.touchLeftBorder());
+            for (const enemy of enemiesSquad.enemies) {
+                if (enemy.touchLeftBorder()) {
+                    console.log('touch left boarder');
+                    enemiesSquad.squadGoLeft = false;
+                    break;
+                }
+                if (enemy.touchRightBorder()) {
+                    enemiesSquad.squadGoLeft = true;
+                    break;
+                }
+            }
+        }
 
         if (this.ticks % 5 === 0) {
-            if (this.enemiesGoLeft) {
-                this.enemies.forEach((enemy) => { enemy.moveLeft(SHIP_SPEED) });
-            }
-            else if (!this.enemiesGoLeft) {
-                this.enemies.forEach((enemy) => { enemy.moveRight(SHIP_SPEED) });
+            for (const enemiesSquad of this.enemiesSquads) {
+                if (enemiesSquad.squadGoLeft) {
+                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveLeft(SHIP_SPEED * 2) });
+                }
+                else {
+                    enemiesSquad.enemies.forEach((enemy) => { enemy.moveRight(SHIP_SPEED * 2) });                
+                }
             }
         }
 
-        for (const enemy of this.enemies) {
-            console.log(enemy.touchLeftBorder(0));
-            if (enemy.touchLeftBorder(0)) {
-                console.log('touch left boarder');
-                this.enemiesGoLeft = false;
-                break;
-            }
-            if (enemy.touchRightBorder(0)) {
-                this.enemiesGoLeft = true;
-                break;
-            }
-        }
-        
         this.bullets.forEach((bullet) => {bullet.moveUp(BULLET_SPEED)});
 
-        this.enemies = this.enemies.filter((el) => {return !el.needToDelete;});
+        for (const enemiesSquad of this.enemiesSquads) {
+            enemiesSquad.enemies = enemiesSquad.enemies.filter((el) => {return !el.needToDelete;});
+        }
         this.bullets = this.bullets.filter((el) => {return !el.needToDelete;});
 
         if (this.ticks >= TICKS_IN_ROW) {
