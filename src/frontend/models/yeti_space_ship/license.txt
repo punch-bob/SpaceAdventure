@@ -1,0 +1,11 @@
+Model Information:
+* title:	Yeti - 01 Space Ship
+* source:	https://sketchfab.com/3d-models/yeti-01-space-ship-6147a6768e464e9b9b76c22ab05d4f26
+* author:	Anthonely Lora (https://sketchfab.com/anthonely.lora)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Yeti - 01 Space Ship" (https://sketchfab.com/3d-models/yeti-01-space-ship-6147a6768e464e9b9b76c22ab05d4f26) by Anthonely Lora (https://sketchfab.com/anthonely.lora) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
