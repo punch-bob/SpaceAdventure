@@ -41,13 +41,13 @@ class Ship {
         this.checkCoord();
     }
 
-    touchLeftBorder(value) {
+    touchLeftBorder(value = 0) {
         let pos = this.UIobj.position;
         if (pos.x - value <= -HALF_GAME_SCENE_WIDTH) return true;
         return false;
     }
 
-    touchRightBorder(value) {
+    touchRightBorder(value = 0) {
         let pos = this.UIobj.position;
         if (pos.x + value >= HALF_GAME_SCENE_WIDTH) return true;
         return false;
