@@ -1,10 +1,9 @@
-
-import { Ship } from './ship.js';
 import { ENEMY_SHIP_SIZE } from './constants.js'
 import { HALF_GAME_SCENE_WIDTH } from './constants.js';
 import { GAME_SCENE_HEIGHT } from './constants.js';
 import { Player } from './player.js';
 import { Enemy } from './enemy.js';
+import { Bullet } from './bullet.js';
 
 const ENEMIES_IN_ROW = 10;
 const TICKS_IN_ROW = 300;
@@ -22,6 +21,7 @@ class World {
         this.modelManager = modelManager;
         this.enemiesGoLeft = false;
         this.score = 0;
+        this.gemeOver = false;
         this.initialize();
     }
 
@@ -53,36 +53,27 @@ class World {
     spawnRowOfEnemies(shift) {
         const enemiesLine = [];
         if (ENEMIES_IN_ROW % 2 == 1) {
-            let enemy = new Enemy(this.modelManager.getEnemyModel(), 0, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            enemiesLine.push(enemy);
+            this.spawnEnemy(enemiesLine, 0, GAME_SCENE_HEIGHT - shift, 0);
         }
 
-        let half = (ENEMIES_IN_ROW - (ENEMIES_IN_ROW % 2)) / 2;
+        const half = (ENEMIES_IN_ROW - (ENEMIES_IN_ROW % 2)) / 2;
 
         for (let i = 0; i < half; ++i) {
-            let enemyRight = new Enemy(this.modelManager.getEnemyModel(), i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            enemiesLine.push(enemyRight);
-
-            let enemyLeft = new Enemy(this.modelManager.getEnemyModel(), -i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0, this.scene_);
-            enemiesLine.push(enemyLeft);
+            this.spawnEnemy(enemiesLine, i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0);
+            this.spawnEnemy(enemiesLine, -i * ENEMY_SHIP_SIZE * 3, GAME_SCENE_HEIGHT - shift, 0);
         }
         return enemiesLine;
     }
 
-    // movePlayerLeft(val) {
-    //     if (this.player.getPosition().x - val <= -HALF_GAME_SCENE_WIDTH) return;
-    //     this.player.moveLeft(val);
-    // }
-
-    // movePlayerRight(val) {
-    //     if (this.player.getPosition().x + val >= HALF_GAME_SCENE_WIDTH) return;
-    //     this.player.moveRight(val);
-    // }
+    spawnEnemy(enemisLine, x, y, z) {
+        const enemy = new Enemy(this.modelManager.getEnemyModel(), x, y, z, this.scene_);
+        enemisLine.push(enemy);
+    }
 
     shootBullet() {
         if (this.last_bullet_t === 0) {
-            let pos = this.player.getPosition();
-            let bullet = new Ship(this.modelManager.getBulletModel(), pos.x, pos.y, pos.z, this.scene_);
+            const pos = this.player.getPosition();
+            const bullet = new Bullet(this.modelManager.getBulletModel(), pos.x, pos.y, pos.z, this.scene_);
             this.bullets.push(bullet);
             this.last_bullet_t = 1;
         }
@@ -161,9 +152,18 @@ class World {
 
         this.updateScore();
         for (const enemiesSquad of this.enemiesSquads) {
-            this.player.checkCollision(enemiesSquad.enemies); 
-            console.log(enemiesSquad.enemies);  
+            enemiesSquad.enemies.forEach((enemy) => {
+                if (enemy.checkCollision()) {
+                    this.gameOver = true;
+                }
+            });
         }
+
+        this.bullets.forEach((bullet) => {
+            for (const enemiesSquad of this.enemiesSquads) {
+                bullet.checkCollision(enemiesSquad.enemies);   
+            }
+        });
     }
 };
 

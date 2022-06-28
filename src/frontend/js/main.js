@@ -82,9 +82,11 @@ class Game {
 
     RAF_() {
         requestAnimationFrame(() => {
-            this.RAF_();
-            this.step();
-            this.threejs_.render(this.scene_, this.camera_);
+            if (!this.world.gameOver) {
+                this.RAF_();
+                this.step();
+                this.threejs_.render(this.scene_, this.camera_);
+            }
         });
     }
 

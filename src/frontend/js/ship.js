@@ -25,23 +25,26 @@ class Ship {
     constructor(model, x, y, z, scene) {
         this.UIobj = model;
         this.needToDelete = false;
-        this.heatBox = new THREE.Box3();
-        this.heatBox.setFromObject(this.UIobj);
+        this.healt = 1;
 
         scene.add(this.UIobj);
         this.setPosition(x, y, z);
-        this.checkCoord();
+        this.heatBox = new THREE.Box3();
+        this.heatBox.setFromObject(this.UIobj);
+        this.updateAfterChangePos();
     }
 
     moveRight(value = 0) {
         if (!this.touchRightBorder(value)) {
             this.UIobj.position.x += value;
+            this.updateAfterChangePos();
         }
     }
 
     moveLeft(value = 0) {
         if (!this.touchLeftBorder(value)) {
             this.UIobj.position.x -= value;
+            this.updateAfterChangePos();
         }
     }
 
@@ -59,15 +62,17 @@ class Ship {
 
     moveUp(value = 0) {
         this.UIobj.position.y += value;
-        if (!this.checkCoord()) {
-            removeObject3D(this.UIobj);
-            this.needToDelete = true;
-        }
+        this.updateAfterChangePos();
     }
 
     moveDown(value = 0) {
         this.UIobj.position.y -= value;
-        if (!this.checkCoord()) {
+        this.updateAfterChangePos();
+    }
+
+    updateAfterChangePos() {
+        this.heatBox.setFromObject(this.UIobj);
+        if (!this.checkCoord() || this.healt <= 0) {
             removeObject3D(this.UIobj);
             this.needToDelete = true;
         }

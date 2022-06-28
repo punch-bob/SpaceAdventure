@@ -6,6 +6,13 @@ class Enemy extends Ship {
         this.level = 1;
         this.health = this.level;
     }
+
+    checkCollision() {
+        if (this.getPosition().y <= 0) {
+            return true;
+        }
+        return false;
+    }
 }
 
 export { Enemy };
