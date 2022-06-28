@@ -5,6 +5,7 @@ class Control {
 
     constructor(world) {
         this.world = world;
+        this.player = world.getPlayer();
 
         this.keys = {
             space: false,
@@ -49,10 +50,10 @@ class Control {
 
     update_() {
         if (this.keys.left) {
-            this.world.movePlayerLeft(SPEED);
+            this.player.moveLeft(SPEED);
         }
         if (this.keys.right) {
-            this.world.movePlayerRight(SPEED);
+            this.player.moveRight(SPEED);
         }
         if (this.keys.space) {
             this.world.shootBullet();

@@ -25,6 +25,8 @@ class Ship {
     constructor(model, x, y, z, scene) {
         this.UIobj = model;
         this.needToDelete = false;
+        this.heatBox = new THREE.Box3();
+        this.heatBox.setFromObject(this.UIobj);
 
         scene.add(this.UIobj);
         this.setPosition(x, y, z);
@@ -44,13 +46,13 @@ class Ship {
     }
 
     touchLeftBorder(value = 0) {
-        let pos = this.UIobj.position;
+        const pos = this.UIobj.position;
         if (pos.x - value <= -HALF_GAME_SCENE_WIDTH) return true;
         return false;
     }
 
     touchRightBorder(value = 0) {
-        let pos = this.UIobj.position;
+        const pos = this.UIobj.position;
         if (pos.x + value >= HALF_GAME_SCENE_WIDTH) return true;
         return false;
     }
