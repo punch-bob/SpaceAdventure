@@ -4,6 +4,7 @@ class Player extends Ship {
     constructor(model, x, y, z, scene) {
         super(model, x, y, z, scene);
         this.level = 1;
+        this.bulletsQueueLenght = 1;
     }
 
     moveDown() {
