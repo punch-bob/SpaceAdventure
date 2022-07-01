@@ -19,12 +19,12 @@ class Bullet extends Ship {
     }
 
     checkCollision(enemies) {
-        this.heatBox.setFromObject(this.UIobj);
+        this.hitBox.setFromObject(this.UIobj);
         enemies.forEach(enemy => {
-            const enemyBox = enemy.heatBox;
-            if (this.heatBox.intersectsBox(enemyBox)) {
-                this.healt--;
-                enemy.healt--;
+            const enemyBox = enemy.hitBox;
+            if (this.hitBox.intersectsBox(enemyBox)) {
+                this.health--;
+                enemy.health--;
             }
         });
     }

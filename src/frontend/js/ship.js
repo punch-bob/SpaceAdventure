@@ -25,12 +25,12 @@ class Ship {
     constructor(model, x, y, z, scene) {
         this.UIobj = model;
         this.needToDelete = false;
-        this.healt = 1;
+        this.health = 1;
 
         scene.add(this.UIobj);
         this.setPosition(x, y, z);
-        this.heatBox = new THREE.Box3();
-        this.heatBox.setFromObject(this.UIobj);
+        this.hitBox = new THREE.Box3();
+        this.hitBox.setFromObject(this.UIobj);
         this.updateAfterChangePos();
     }
 
@@ -71,8 +71,8 @@ class Ship {
     }
 
     updateAfterChangePos() {
-        this.heatBox.setFromObject(this.UIobj);
-        if (!this.checkCoord() || this.healt <= 0) {
+        this.hitBox.setFromObject(this.UIobj);
+        if (!this.checkCoord() || this.health <= 0) {
             removeObject3D(this.UIobj);
             this.needToDelete = true;
         }
