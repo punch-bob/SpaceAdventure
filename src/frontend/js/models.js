@@ -42,7 +42,7 @@ class ModelManager {
         let gltf = await loader.loadAsync(ENEMY_MODEL_PATH);
         this.enemyModel = gltf.scene;
         this.enemyModel.rotation.x = Math.PI / 2;
-        this.enemyModel.scale.multiplyScalar(2);
+        this.enemyModel.scale.multiplyScalar(1.75);
     }
 
     async loadModels() {
